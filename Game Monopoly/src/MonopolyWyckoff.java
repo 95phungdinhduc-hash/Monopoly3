@@ -90,6 +90,10 @@ public class MonopolyWyckoff extends JFrame {
             setFont(new Font("Arial", Font.BOLD, 14));
             setBorder(BorderFactory.createLineBorder(Color.WHITE, 1));
 
+            // Xử lý lỗi trong suốt hoặc mất màu nền trên các OS khác nhau (do Look & Feel)
+            setContentAreaFilled(false);
+            setOpaque(false);
+
             if (foundPath != null) {
                 ImageIcon icon = new ImageIcon(foundPath);
                 // Tăng scale lên 35x35 để icon to và rõ nét
@@ -101,6 +105,17 @@ public class MonopolyWyckoff extends JFrame {
             } else {
                 setHorizontalAlignment(SwingConstants.CENTER);
             }
+        }
+
+        @Override
+        protected void paintComponent(Graphics g) {
+            Graphics2D g2 = (Graphics2D) g.create();
+            // Tự vẽ màu nền cho button để đảm bảo cross-platform và hỗ trợ màu trong suốt
+            // (alpha)
+            g2.setColor(getBackground());
+            g2.fillRect(0, 0, getWidth(), getHeight());
+            g2.dispose();
+            super.paintComponent(g);
         }
     }
 
@@ -187,9 +202,7 @@ public class MonopolyWyckoff extends JFrame {
             gameManager.setPaused(!gameManager.isPaused());
             btnPause.setText(gameManager.isPaused() ? "RESUME" : "PAUSE");
         });
-        JButton btnExit = new JButton("EXIT GAME");
-        btnExit.setBackground(new Color(180, 0, 0));
-        btnExit.setForeground(Color.WHITE);
+        GameStyledButton btnExit = new GameStyledButton("EXIT GAME", new Color(180, 0, 0), null);
         btnExit.addActionListener(e -> System.exit(0));
         menu.add(btnPause);
         menu.add(new JButton("SAVE"));
